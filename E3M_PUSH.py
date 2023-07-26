@@ -15,6 +15,7 @@ def extractSHA(responseBody):
     sha_start_index = responseBody.find("\"sha\":\"") + 7
     sha_end_index = responseBody.find("\"", sha_start_index)
     return responseBody[sha_start_index:sha_end_index]
+    raise TypeError(responseBody[sha_start_index:sha_end_index])
     
 
 autoscriptName=mbo.getString("AUTOSCRIPT")
@@ -25,12 +26,26 @@ gitHubToken=MXServer.getMXServer().getProperty("e3m.github.token")
 gitHubCode=MXServer.getMXServer().getProperty("e3m.github.download.url")+autoscriptName+".py"
 
 url = URL(gitHubApi)
-print(url)
+#raise TypeError(downloadurl)
 con= url.openConnection()
 con.setRequestMethod("GET");
 con.setRequestProperty("Content-Type", "application/json")
 con.setRequestProperty("Authorization", "Bearer " + gitHubToken)
 statusCode = con.getResponseCode();
+
+'''
+downloadUrl = URL(gitHubCode);
+raise TypeError(d)
+uc = downloadUrl.openConnection();
+urlreader = BufferedReader(InputStreamReader(uc.getInputStream()));
+inputLine = urlreader.readLine()
+raise TypeError(inputLine)
+while inputLine is not None:
+    #System.out.println(inputLine);
+    raise TypeError(inputLine)
+#in.close();
+'''
+
 if (statusCode == 200):
     reader = BufferedReader(InputStreamReader(con.getInputStream()));
     response = StringBuilder();

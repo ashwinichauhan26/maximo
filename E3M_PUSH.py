@@ -14,19 +14,19 @@ from java.lang import String
 def extractSHA(responseBody):
     sha_start_index = responseBody.find("\"sha\":\"") + 7
     sha_end_index = responseBody.find("\"", sha_start_index)
+    #raise TypeError(responseBody[sha_start_index:sha_end_index])
     return responseBody[sha_start_index:sha_end_index]
-    raise TypeError(responseBody[sha_start_index:sha_end_index])
     
 
 autoscriptName=mbo.getString("AUTOSCRIPT")
 source=mbo.getString("SOURCE")
 sourceCode=Base64.getEncoder().encodeToString(String(source).getBytes("UTF-8"));
+
 gitHubApi=MXServer.getMXServer().getProperty("e3m.github.api")+autoscriptName+".py"
 gitHubToken=MXServer.getMXServer().getProperty("e3m.github.token")
 gitHubCode=MXServer.getMXServer().getProperty("e3m.github.download.url")+autoscriptName+".py"
 
 url = URL(gitHubApi)
-#raise TypeError(downloadurl)
 con= url.openConnection()
 con.setRequestMethod("GET");
 con.setRequestProperty("Content-Type", "application/json")

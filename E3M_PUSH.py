@@ -32,6 +32,7 @@ con.setRequestMethod("GET");
 con.setRequestProperty("Content-Type", "application/json")
 con.setRequestProperty("Authorization", "Bearer " + gitHubToken)
 statusCode = con.getResponseCode();
+#raise TypeError(statusCode)
 
 '''
 downloadUrl = URL(gitHubCode);
@@ -74,10 +75,10 @@ if (statusCode == 200):
     os.flush()
     os.close()
     responsecode=conUpdate.getResponseCode()
+    raise TypeError(responseCode)
     conUpdate.disconnect()
 else:
     githubcontent = String.format("{\"message\":\"Add file\",\"content\":\"%s\"}",sourceCode);
-
     conCreate= url.openConnection()
     conCreate.setRequestMethod("PUT");
     conCreate.setRequestProperty("Content-Type", "application/json")

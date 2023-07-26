@@ -75,7 +75,7 @@ if (statusCode == 200):
     os.flush()
     os.close()
     responsecode=conUpdate.getResponseCode()
-    raise TypeError(responseCode)
+    raise TypeError(responsecode)
     conUpdate.disconnect()
 else:
     githubcontent = String.format("{\"message\":\"Add file\",\"content\":\"%s\"}",sourceCode);

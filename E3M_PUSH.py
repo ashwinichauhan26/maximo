@@ -21,6 +21,7 @@ def fetch_file_content_from_github(github_raw_url):
         # Python 2: httplib
         import httplib
         connection = httplib.HTTPSConnection('raw.githubusercontent.com')
+        raise TypeError(connection)
 
         # Python 3: http.client
         # import http.client

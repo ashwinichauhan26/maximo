@@ -10,43 +10,34 @@ from java.net import HttpURLConnection
 from java.net import URL
 from java.util import Base64
 from java.lang import String
-#from java.net import *
+from java.io import BufferedReader, InputStreamReader
 
 autoscriptName=mbo.getString("AUTOSCRIPT")
 gitHubCode=MXServer.getMXServer().getProperty("e3m.github.download.url")+autoscriptName+".py"
 
 def fetch_file_content_from_github(github_raw_url):
     try:
-        # Depending on your Python version, import the appropriate library
-        # Python 2: httplib
-        import httplib
-        connection = httplib.HTTPSConnection('raw.githubusercontent.com')
-        raise TypeError(connection)
+        url = URL(github_raw_url)
+        conn = url.openConnection()
 
-        # Python 3: http.client
-        # import http.client
-        # connection = http.client.HTTPSConnection('raw.githubusercontent.com')
+        # Open the input stream and read the content
+        input_stream = conn.getInputStream()
+        input_reader = BufferedReader(InputStreamReader(input_stream))
+        content = ""
+        line = input_reader.readLine()
+        while line is not None:
+            content += line + "\n"
+            line = input_reader.readLine()
 
-        connection.request('GET', github_raw_url)
-        dresponse = connection.getresponse()
-        raise TypeError(dresponse)
-
-        if dresponse.status == 200:
-            content = dresponse.read().decode('utf-8')
-            raise TypeError(content)
-            return content
-        else:
-            #print(f"Failed to fetch data from GitHub. Status code {dresponse.status}")
-            return None
-
+        input_reader.close()
+        raise TypeError(content)
+        return content
     except Exception as e:
         #print(f"An error occurred: {e}")
         return None
 
 # Example usage in Maximo Automation Script:
 github_raw_url = URL(gitHubCode)
-#raise TypeError(github_raw_url)
-    
 data = fetch_file_content_from_github(github_raw_url)
 if data:
     print("File content from GitHub:")

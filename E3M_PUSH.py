@@ -51,17 +51,10 @@ def save_to_local_file(file_path, content):
 
 github_raw_url = URL(gitHubCode)
 data = fetch_file_content_from_github(github_raw_url)
-if data:
-    service.log("File content from GitHub:")
-    service.log(data)
 
-    # Replace 'your_local_file_path' with the path to the destination file on your local system
+if data:
     file_path = "D:\\autoscript.txt"
     save_to_local_file(file_path, data)
-    service.log("Data copied to local file.")
-if data:
-    print("File content from GitHub:",data)
-    service.log(data)
     
 else:
     print("Failed to fetch data from GitHub.")

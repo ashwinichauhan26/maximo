@@ -21,7 +21,6 @@ def fetch_file_content_from_github(github_raw_url):
     #url = URL(github_raw_url)
     #conn = url.openConnection()
 
-        # Open the input stream and read the content
     input_stream = conn.getInputStream()
     input_reader = BufferedReader(InputStreamReader(input_stream))
     content = ""
@@ -31,35 +30,37 @@ def fetch_file_content_from_github(github_raw_url):
         line = input_reader.readLine()
 
     input_reader.close()
-    #raise TypeError(content)
     return content
-    #except Exception as e:
-        #print(f"An error occurred: {e}")
-     #   return None
-     
+    
+
 def save_to_local_file(file_path, content):
-    file_writer = FileWriter(file_path)
-    file_writer.write(content)
-    file_writer.close()
-    
-    #service.log("File content saved to: " + file_path)
-    
-    #except Exception as e:
-     #   service.log("An error occurred while saving the content: " + str(e))
-# Example usage in Maximo Automation Script:
+    try:
+        file_writer = FileWriter(file_path)
+        file_writer.write(content)
+    except Exception as e:
+        service.log("An error occurred while saving the content: " + str(e))
+    finally:
+        if file_writer:
+            file_writer.close()
+            service.log("File writer closed.")
+
+
 github_raw_url = URL(gitHubCode)
 data = fetch_file_content_from_github(github_raw_url)
-#raise TypeError(data)
 if data:
-    #print("File content from GitHub:")
-    #service.log(data)
+    service.log("File content from GitHub:")
+    service.log(data)
+
+    # Replace 'your_local_file_path' with the path to the destination file on your local system
+    file_path = "D:\\autoscript.txt"
+    save_to_local_file(file_path, data)
+    service.log("Data copied to local file.")
+if data:
+    print("File content from GitHub:",data)
+    service.log(data)
     
-    save_to_local_file("D:\ autoscr.txt", data)
 else:
     print("Failed to fetch data from GitHub.")
-
-
-
 
 
 def extractSHA(responseBody):

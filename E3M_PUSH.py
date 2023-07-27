@@ -32,6 +32,7 @@ def fetch_file_content_from_github(github_raw_url):
 
         if dresponse.status == 200:
             content = dresponse.read().decode('utf-8')
+            raise TypeError(content)
             return content
         else:
             #print(f"Failed to fetch data from GitHub. Status code {dresponse.status}")

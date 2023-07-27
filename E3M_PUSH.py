@@ -10,7 +10,7 @@ from java.net import HttpURLConnection
 from java.net import URL
 from java.util import Base64
 from java.lang import String
-from java.io import BufferedReader, InputStreamReader
+from java.io import BufferedReader, InputStreamReader, FileWriter
 
 autoscriptName=mbo.getString("AUTOSCRIPT")
 gitHubCode=MXServer.getMXServer().getProperty("e3m.github.download.url")+autoscriptName+".py"
@@ -36,14 +36,25 @@ def fetch_file_content_from_github(github_raw_url):
     #except Exception as e:
         #print(f"An error occurred: {e}")
      #   return None
-
+     
+def save_to_local_file(file_path, content):
+    file_writer = FileWriter(file_path)
+    file_writer.write(content)
+    file_writer.close()
+    
+    #service.log("File content saved to: " + file_path)
+    
+    #except Exception as e:
+     #   service.log("An error occurred while saving the content: " + str(e))
 # Example usage in Maximo Automation Script:
 github_raw_url = URL(gitHubCode)
 data = fetch_file_content_from_github(github_raw_url)
 #raise TypeError(data)
 if data:
-    print("File content from GitHub:")
-    service.log(data)
+    #print("File content from GitHub:")
+    #service.log(data)
+    
+    save_to_local_file("D:\ autoscr.txt", data)
 else:
     print("Failed to fetch data from GitHub.")
 

@@ -38,7 +38,7 @@ def save_to_local_file(file_path, content):
     file_writer = FileWriter(file_path)
     file_writer.write(content)
     file_writer.flush();
-    fileWriter.close();
+    file_writer.close();
     
     '''
     except Exception as e:

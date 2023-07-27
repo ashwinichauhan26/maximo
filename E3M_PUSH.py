@@ -37,6 +37,7 @@ def save_to_local_file(file_path, content):
     try:
         file_writer = FileWriter(file_path)
         file_writer.write(content)
+        raise TypeError(file_writer)
     except Exception as e:
         service.log("An error occurred while saving the content: " + str(e))
     finally:

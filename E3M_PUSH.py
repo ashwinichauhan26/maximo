@@ -16,25 +16,26 @@ autoscriptName=mbo.getString("AUTOSCRIPT")
 gitHubCode=MXServer.getMXServer().getProperty("e3m.github.download.url")+autoscriptName+".py"
 
 def fetch_file_content_from_github(github_raw_url):
-    try:
-        url = URL(github_raw_url)
-        conn = url.openConnection()
+    java_url = URL(str(github_raw_url))
+    conn = java_url.openConnection()
+    #url = URL(github_raw_url)
+    #conn = url.openConnection()
 
         # Open the input stream and read the content
-        input_stream = conn.getInputStream()
-        input_reader = BufferedReader(InputStreamReader(input_stream))
-        content = ""
+    input_stream = conn.getInputStream()
+    input_reader = BufferedReader(InputStreamReader(input_stream))
+    content = ""
+    line = input_reader.readLine()
+    while line is not None:
+        content += line + "\n"
         line = input_reader.readLine()
-        while line is not None:
-            content += line + "\n"
-            line = input_reader.readLine()
 
-        input_reader.close()
-        raise TypeError(content)
-        return content
-    except Exception as e:
+    input_reader.close()
+    #raise TypeError(content)
+    return content
+    #except Exception as e:
         #print(f"An error occurred: {e}")
-        return None
+     #   return None
 
 # Example usage in Maximo Automation Script:
 github_raw_url = URL(gitHubCode)

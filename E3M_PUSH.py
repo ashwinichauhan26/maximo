@@ -10,6 +10,49 @@ from java.net import HttpURLConnection
 from java.net import URL
 from java.util import Base64
 from java.lang import String
+#from java.net import *
+
+
+def fetch_file_content_from_github(github_raw_url):
+    try:
+        # Depending on your Python version, import the appropriate library
+        # Python 2: httplib
+        import httplib
+        connection = httplib.HTTPSConnection('raw.githubusercontent.com')
+
+        # Python 3: http.client
+        # import http.client
+        # connection = http.client.HTTPSConnection('raw.githubusercontent.com')
+
+        connection.request('GET', github_raw_url)
+        dresponse = connection.getresponse()
+        raise TypeError(dresponse)
+
+        if dresponse.status == 200:
+            content = dresponse.read().decode('utf-8')
+            return content
+        else:
+            #print(f"Failed to fetch data from GitHub. Status code {dresponse.status}")
+            return None
+
+    except Exception as e:
+        #print(f"An error occurred: {e}")
+        return None
+
+# Example usage in Maximo Automation Script:
+if __name__ == "__main__":
+    github_raw_url = URL(GitHubCode)
+    
+    data = fetch_file_content_from_github(github_raw_url)
+    if data:
+        print("File content from GitHub:")
+        print(data)
+    else:
+        print("Failed to fetch data from GitHub.")
+
+
+
+
 
 def extractSHA(responseBody):
     sha_start_index = responseBody.find("\"sha\":\"") + 7
@@ -32,22 +75,9 @@ con.setRequestMethod("GET");
 con.setRequestProperty("Content-Type", "application/json")
 con.setRequestProperty("Authorization", "Bearer " + gitHubToken)
 statusCode = con.getResponseCode();
-#raise TypeError(statusCode)
 
-'''
-downloadUrl = URL(gitHubCode);
-raise TypeError(d)
-uc = downloadUrl.openConnection();
-urlreader = BufferedReader(InputStreamReader(uc.getInputStream()));
-inputLine = urlreader.readLine()
-raise TypeError(inputLine)
-while inputLine is not None:
-    #System.out.println(inputLine);
-    raise TypeError(inputLine)
-#in.close();
-'''
 
-if (statusCode == 200):
+if (statusCode == 200 or dstatusCode == 200):
     reader = BufferedReader(InputStreamReader(con.getInputStream()));
     response = StringBuilder();
     line = reader.readLine();
@@ -55,10 +85,9 @@ if (statusCode == 200):
         response.append(line);
         line = reader.readLine();
         
-    reader.close();
+    #reader.close();
     
     responseBody = response.toString();
-    #####
     #mbo.setValue("source",responseBody);
     sha = extractSHA(responseBody);
     params = [sha]
@@ -75,8 +104,8 @@ if (statusCode == 200):
     os.flush()
     os.close()
     responsecode=conUpdate.getResponseCode()
-    raise TypeError(responsecode)
     conUpdate.disconnect()
+
 else:
     githubcontent = String.format("{\"message\":\"Add file\",\"content\":\"%s\"}",sourceCode);
     conCreate= url.openConnection()

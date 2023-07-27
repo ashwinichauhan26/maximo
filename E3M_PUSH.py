@@ -40,9 +40,10 @@ def fetch_file_content_from_github(github_raw_url):
 # Example usage in Maximo Automation Script:
 github_raw_url = URL(gitHubCode)
 data = fetch_file_content_from_github(github_raw_url)
+#raise TypeError(data)
 if data:
     print("File content from GitHub:")
-    print(data)
+    service.log(data)
 else:
     print("Failed to fetch data from GitHub.")
 

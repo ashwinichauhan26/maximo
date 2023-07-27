@@ -30,21 +30,24 @@ def fetch_file_content_from_github(github_raw_url):
         line = input_reader.readLine()
 
     input_reader.close()
+    #raise TypeError(content)
     return content
     
 
 def save_to_local_file(file_path, content):
-    try:
-        file_writer = FileWriter(file_path)
-        file_writer.write(content)
-        raise TypeError(file_writer)
+    file_writer = FileWriter(file_path)
+    file_writer.write(content)
+    file_writer.flush();
+    fileWriter.close();
+    
+    '''
     except Exception as e:
         service.log("An error occurred while saving the content: " + str(e))
     finally:
         if file_writer:
             file_writer.close()
             service.log("File writer closed.")
-
+    '''
 
 github_raw_url = URL(gitHubCode)
 data = fetch_file_content_from_github(github_raw_url)

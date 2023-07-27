@@ -12,6 +12,8 @@ from java.util import Base64
 from java.lang import String
 #from java.net import *
 
+autoscriptName=mbo.getString("AUTOSCRIPT")
+gitHubCode=MXServer.getMXServer().getProperty("e3m.github.download.url")+autoscriptName+".py"
 
 def fetch_file_content_from_github(github_raw_url):
     try:
@@ -40,16 +42,15 @@ def fetch_file_content_from_github(github_raw_url):
         return None
 
 # Example usage in Maximo Automation Script:
-if __name__ == "__main__":
-    github_raw_url = URL(GitHubCode)
-    raise TypeError(github_raw_url)
+github_raw_url = URL(gitHubCode)
+#raise TypeError(github_raw_url)
     
-    data = fetch_file_content_from_github(github_raw_url)
-    if data:
-        print("File content from GitHub:")
-        print(data)
-    else:
-        print("Failed to fetch data from GitHub.")
+data = fetch_file_content_from_github(github_raw_url)
+if data:
+    print("File content from GitHub:")
+    print(data)
+else:
+    print("Failed to fetch data from GitHub.")
 
 
 

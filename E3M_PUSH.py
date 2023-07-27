@@ -42,6 +42,7 @@ def fetch_file_content_from_github(github_raw_url):
 # Example usage in Maximo Automation Script:
 if __name__ == "__main__":
     github_raw_url = URL(GitHubCode)
+    raise TypeError(github_raw_url)
     
     data = fetch_file_content_from_github(github_raw_url)
     if data:

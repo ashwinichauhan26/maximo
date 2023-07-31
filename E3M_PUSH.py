@@ -10,16 +10,13 @@ from java.net import HttpURLConnection
 from java.net import URL
 from java.util import Base64
 from java.lang import String
-from java.io import BufferedReader, InputStreamReader, FileWriter
+from java.io import FileWriter
 
-autoscriptName=mbo.getString("AUTOSCRIPT")
-gitHubCode=MXServer.getMXServer().getProperty("e3m.github.download.url")+autoscriptName+".py"
+
 
 def fetch_file_content_from_github(github_raw_url):
     java_url = URL(str(github_raw_url))
     conn = java_url.openConnection()
-    #url = URL(github_raw_url)
-    #conn = url.openConnection()
 
     input_stream = conn.getInputStream()
     input_reader = BufferedReader(InputStreamReader(input_stream))
@@ -34,30 +31,23 @@ def fetch_file_content_from_github(github_raw_url):
     return content
     
 
-def save_to_local_file(file_path, content):
-    file_writer = FileWriter(file_path)
-    file_writer.write(content)
-    file_writer.flush();
-    file_writer.close();
-    
-    '''
-    except Exception as e:
-        service.log("An error occurred while saving the content: " + str(e))
-    finally:
-        if file_writer:
-            file_writer.close()
-            service.log("File writer closed.")
-    '''
+if launchPoint == "E3M_PULL":
+    autoscriptName=mbo.getString("AUTOSCRIPT")
+    gitHubCode=MXServer.getMXServer().getProperty("e3m.github.download.url")+autoscriptName+".py"
+    github_raw_url = URL(gitHubCode)
+    data = fetch_file_content_from_github(github_raw_url)
+    raise TypeError(data)
 
-github_raw_url = URL(gitHubCode)
-data = fetch_file_content_from_github(github_raw_url)
-
-if data:
-    file_path = "D:\\autoscript.txt"
-    save_to_local_file(file_path, data)
-    
-else:
-    print("Failed to fetch data from GitHub.")
+    if data:
+        e3msScripSet=mbo.getMboSet("e3mscript")
+        #mbo_name=e3msScripSet.getMbo(0)
+        e3msScript=e3msScripSet.add()
+        e3msScript.setValue("source",data,MboConstants.NOACCESSCHECK)
+        e3msScript.setValue("autoscript",autoscriptName,MboConstants.NOACCESSCHECK)
+        e3msScripSet.save()
+        
+    else:
+        print("Failed to fetch data from GitHub.")
 
 
 def extractSHA(responseBody):
@@ -66,65 +56,65 @@ def extractSHA(responseBody):
     #raise TypeError(responseBody[sha_start_index:sha_end_index])
     return responseBody[sha_start_index:sha_end_index]
     
-
-autoscriptName=mbo.getString("AUTOSCRIPT")
-source=mbo.getString("SOURCE")
-sourceCode=Base64.getEncoder().encodeToString(String(source).getBytes("UTF-8"));
-
-gitHubApi=MXServer.getMXServer().getProperty("e3m.github.api")+autoscriptName+".py"
-gitHubToken=MXServer.getMXServer().getProperty("e3m.github.token")
-gitHubCode=MXServer.getMXServer().getProperty("e3m.github.download.url")+autoscriptName+".py"
-
-url = URL(gitHubApi)
-con= url.openConnection()
-con.setRequestMethod("GET");
-con.setRequestProperty("Content-Type", "application/json")
-con.setRequestProperty("Authorization", "Bearer " + gitHubToken)
-statusCode = con.getResponseCode();
-
-
-if (statusCode == 200 or dstatusCode == 200):
-    reader = BufferedReader(InputStreamReader(con.getInputStream()));
-    response = StringBuilder();
-    line = reader.readLine();
-    while (line is not None):
-        response.append(line);
+if launchPoint == "E3M_PUSH":
+    autoscriptName=mbo.getString("AUTOSCRIPT")
+    source=mbo.getString("SOURCE")
+    sourceCode=Base64.getEncoder().encodeToString(String(source).getBytes("UTF-8"));
+    
+    gitHubApi=MXServer.getMXServer().getProperty("e3m.github.api")+autoscriptName+".py"
+    gitHubToken=MXServer.getMXServer().getProperty("e3m.github.token")
+    gitHubCode=MXServer.getMXServer().getProperty("e3m.github.download.url")+autoscriptName+".py"
+    
+    url = URL(gitHubApi)
+    con= url.openConnection()
+    con.setRequestMethod("GET");
+    con.setRequestProperty("Content-Type", "application/json")
+    con.setRequestProperty("Authorization", "Bearer " + gitHubToken)
+    statusCode = con.getResponseCode();
+    
+    
+    if (statusCode == 200):
+        reader = BufferedReader(InputStreamReader(con.getInputStream()));
+        response = StringBuilder();
         line = reader.readLine();
+        while (line is not None):
+            response.append(line);
+            line = reader.readLine();
+            
+        #reader.close();
         
-    #reader.close();
+        responseBody = response.toString();
+        #mbo.setValue("source",responseBody);
+        sha = extractSHA(responseBody);
+        params = [sha]
+        #service.error("access", "field", params)
+        githubcontent = String.format("{\"message\": \"Update file\", \"content\": \"%s\", \"sha\": \"%s\"}", sourceCode, sha);
+        conUpdate= url.openConnection()
+        conUpdate.setRequestMethod("PUT");
+        conUpdate.setRequestProperty("Content-Type", "application/json")
+        conUpdate.setRequestProperty("Authorization", "Bearer " + gitHubToken)
+        conUpdate.setDoOutput(True)
+        os = conUpdate.getOutputStream()
+        content=String(githubcontent).getBytes("UTF-8")
+        os.write(content)
+        os.flush()
+        os.close()
+        responsecode=conUpdate.getResponseCode()
+        conUpdate.disconnect()
     
-    responseBody = response.toString();
-    #mbo.setValue("source",responseBody);
-    sha = extractSHA(responseBody);
-    params = [sha]
-    #service.error("access", "field", params)
-    githubcontent = String.format("{\"message\": \"Update file\", \"content\": \"%s\", \"sha\": \"%s\"}", sourceCode, sha);
-    conUpdate= url.openConnection()
-    conUpdate.setRequestMethod("PUT");
-    conUpdate.setRequestProperty("Content-Type", "application/json")
-    conUpdate.setRequestProperty("Authorization", "Bearer " + gitHubToken)
-    conUpdate.setDoOutput(True)
-    os = conUpdate.getOutputStream()
-    content=String(githubcontent).getBytes("UTF-8")
-    os.write(content)
-    os.flush()
-    os.close()
-    responsecode=conUpdate.getResponseCode()
-    conUpdate.disconnect()
-
-else:
-    githubcontent = String.format("{\"message\":\"Add file\",\"content\":\"%s\"}",sourceCode);
-    conCreate= url.openConnection()
-    conCreate.setRequestMethod("PUT");
-    conCreate.setRequestProperty("Content-Type", "application/json")
-    conCreate.setRequestProperty("Authorization", "Bearer " + gitHubToken)
-    conCreate.setDoOutput(True)
-    
-    os = conCreate.getOutputStream()
-    content=String(githubcontent).getBytes("UTF-8")
-    os.write(content)
-    os.flush()
-    os.close()
-    
-    responsecode=conCreate.getResponseCode()
-    conCreate.disconnect()
+    else:
+        githubcontent = String.format("{\"message\":\"Add file\",\"content\":\"%s\"}",sourceCode);
+        conCreate= url.openConnection()
+        conCreate.setRequestMethod("PUT");
+        conCreate.setRequestProperty("Content-Type", "application/json")
+        conCreate.setRequestProperty("Authorization", "Bearer " + gitHubToken)
+        conCreate.setDoOutput(True)
+        
+        os = conCreate.getOutputStream()
+        content=String(githubcontent).getBytes("UTF-8")
+        os.write(content)
+        os.flush()
+        os.close()
+        
+        responsecode=conCreate.getResponseCode()
+        conCreate.disconnect()

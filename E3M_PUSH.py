@@ -15,6 +15,12 @@ from java.io import FileWriter
 
 
 def fetch_file_content_from_github(github_raw_url):
+    timestamp = str(java.util.Date().getTime())
+    if '?' in github_raw_url:
+        github_raw_url += "&_=" + timestamp
+    else:
+        github_raw_url += "?_=" + timestamp
+    
     java_url = URL(str(github_raw_url))
     conn = java_url.openConnection()
 
@@ -27,7 +33,7 @@ def fetch_file_content_from_github(github_raw_url):
         line = input_reader.readLine()
 
     input_reader.close()
-    #raise TypeError(content)
+    raise TypeError(content)
     return content
     
 
@@ -36,8 +42,7 @@ if launchPoint == "E3M_PULL":
     gitHubCode=MXServer.getMXServer().getProperty("e3m.github.download.url")+autoscriptName+".py"
     github_raw_url = URL(gitHubCode)
     data = fetch_file_content_from_github(github_raw_url)
-   
-   
+    
     if data:
         e3msScripSet=mbo.getMboSet("e3mautoscript")
         if(e3msScripSet.isEmpty()):

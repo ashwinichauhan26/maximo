@@ -13,7 +13,6 @@ from java.lang import String
 from java.io import FileWriter
 
 
-
 def fetch_file_content_from_github(github_raw_url):
     java_url = URL(str(github_raw_url))
     conn = java_url.openConnection()
@@ -37,6 +36,7 @@ if launchPoint == "E3M_PULL":
     data = fetch_file_content_from_github(github_raw_url)
     
     if data:
+        
         e3msScripSet=mbo.getMboSet("e3mautoscript")
         if(e3msScripSet.isEmpty()):
             e3msScript=e3msScripSet.add()

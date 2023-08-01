@@ -15,12 +15,6 @@ from java.io import FileWriter
 
 
 def fetch_file_content_from_github(github_raw_url):
-    timestamp = str(java.util.Date().getTime())
-    if '?' in github_raw_url:
-        github_raw_url += "&_=" + timestamp
-    else:
-        github_raw_url += "?_=" + timestamp
-    
     java_url = URL(str(github_raw_url))
     conn = java_url.openConnection()
 
@@ -33,7 +27,6 @@ def fetch_file_content_from_github(github_raw_url):
         line = input_reader.readLine()
 
     input_reader.close()
-    raise TypeError(content)
     return content
     
 

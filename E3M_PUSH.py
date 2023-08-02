@@ -11,7 +11,11 @@ from java.net import URL
 from java.util import Base64
 from java.lang import String
 from java.io import FileWriter
+from psdi.util.logging import MXLoggerFactory
 
+
+logger = MXLoggerFactory.getLogger("maximo.script");
+logger.debug("Start E3M_PUSH")
 
 def fetch_file_content_from_github(github_raw_url):
     java_url = URL(str(github_raw_url))
@@ -29,31 +33,54 @@ def fetch_file_content_from_github(github_raw_url):
     return content
     
 
+autoscriptName=mbo.getString("AUTOSCRIPT")
+source=mbo.getString("SOURCE")
+sourceCode=Base64.getEncoder().encodeToString(String(source).getBytes("UTF-8"));
+
+gitHubApi=MXServer.getMXServer().getProperty("e3m.github.api")+autoscriptName+".py"
+gitHubToken=MXServer.getMXServer().getProperty("e3m.github.token")
+gitHubCode=MXServer.getMXServer().getProperty("e3m.github.download.url")+autoscriptName+".py"
+
+url = URL(gitHubApi)
+con= url.openConnection()
+con.setRequestMethod("GET");
+#con.setRequestProperty("Content-Type", "application/json")
+con.setRequestProperty("Content-Type", "application/text")
+con.setRequestProperty("Authorization", "Bearer" + gitHubToken)
+statusCode = con.getResponseCode();
+
 if launchPoint == "E3M_PULL":
-    autoscriptName=mbo.getString("AUTOSCRIPT")
-    gitHubCode=MXServer.getMXServer().getProperty("e3m.github.download.url")+autoscriptName+".py"
-    github_raw_url = URL(gitHubCode)
-    data = fetch_file_content_from_github(github_raw_url)
-    
-    if data:
+    #autoscriptName=mbo.getString("AUTOSCRIPT")
+    #gitHubCode=MXServer.getMXServer().getProperty("e3m.github.download.url")+autoscriptName+".py"
+    if (statusCode == 200):
+        github_raw_url = URL(gitHubCode)
+        data = fetch_file_content_from_github(github_raw_url)
         
-        e3msScripSet=mbo.getMboSet("e3mautoscript")
-        if(e3msScripSet.isEmpty()):
-            e3msScript=e3msScripSet.add()
-            e3msScript.setValue("source",data,MboConstants.NOACCESSCHECK)
-            e3msScript.setValue("autoscript",autoscriptName,MboConstants.NOACCESSCHECK)
-            e3msScript.setValue("pull",1,MboConstants.NOACCESSCHECK)
-            e3msScript.setValue("push",0,MboConstants.NOACCESSCHECK)
-            e3msScripSet.save()
+        if data:
+            
+            #e3msScripSet=mbo.getMboSet("e3mautoscript")
+            e3msScripSet = MXServer.getMXServer().getMboSet("E3MAUTOSCRIPT", mbo.getUserInfo())
+            e3msScripSet.setWhere("AUTOSCRIPT='"+autoscriptName+"'")
+            e3msScripSet.reset()
+            if(e3msScripSet.isEmpty()):
+                e3msScript=e3msScripSet.add()
+                e3msScript.setValue("source",data,MboConstants.NOACCESSCHECK)
+                e3msScript.setValue("autoscript",autoscriptName,MboConstants.NOACCESSCHECK)
+                #e3msScript.setValue("pull",1,MboConstants.NOACCESSCHECK)
+                #e3msScript.setValue("push",0,MboConstants.NOACCESSCHECK)
+                e3msScripSet.save()
+            elif(not e3msScripSet.isEmpty()):
+                e3msScript=e3msScripSet.getMbo(0)
+                #e3msScript.setValue("pull",1,MboConstants.NOACCESSCHECK)
+                #e3msScript.setValue("push",0,MboConstants.NOACCESSCHECK)
+                e3msScript.setValue("source",data,MboConstants.NOACCESSCHECK|MboConstants.NOVALIDATION)
+                #e3msScripSet.save()
+                #params = [str(e3msScripSet.count())]
+                #service.error("CI", "invalidassetforci", params)
+            e3msScripSet.save();
+            e3msScripSet.close();
         else:
-            e3msScript=e3msScripSet.getMbo(0)
-            e3msScript.setValue("pull",1,MboConstants.NOACCESSCHECK)
-            e3msScript.setValue("push",0,MboConstants.NOACCESSCHECK)
-            e3msScript.setValue("source",data,MboConstants.NOACCESSCHECK)
-            e3msScripSet.save()
-        
-    else:
-        print("Failed to fetch data from GitHub.")
+            print("Failed to fetch data from GitHub.")
 
 
 def extractSHA(responseBody):
@@ -63,25 +90,12 @@ def extractSHA(responseBody):
     return responseBody[sha_start_index:sha_end_index]
     
 if launchPoint == "E3M_PUSH":
-    autoscriptName=mbo.getString("AUTOSCRIPT")
-    source=mbo.getString("SOURCE")
-    sourceCode=Base64.getEncoder().encodeToString(String(source).getBytes("UTF-8"));
-    
-    gitHubApi=MXServer.getMXServer().getProperty("e3m.github.api")+autoscriptName+".py"
-    gitHubToken=MXServer.getMXServer().getProperty("e3m.github.token")
-    gitHubCode=MXServer.getMXServer().getProperty("e3m.github.download.url")+autoscriptName+".py"
-    
-    url = URL(gitHubApi)
-    con= url.openConnection()
-    con.setRequestMethod("GET");
-    con.setRequestProperty("Content-Type", "application/json")
-    con.setRequestProperty("Authorization", "Bearer " + gitHubToken)
-    statusCode = con.getResponseCode();
+
     
     
     if (statusCode == 200):
-        if(not mbo.getMboSet("e3mautoscript").getMbo(0).getBoolean("pull")):
-            service.error("E3MADMIN", "githubpullbeforeupdate")
+        #if(not mbo.getMboSet("e3mautoscript").getMbo(0).getBoolean("pull")):
+         #   service.error("E3MADMIN", "githubpullbeforeupdate")
         reader = BufferedReader(InputStreamReader(con.getInputStream()));
         response = StringBuilder();
         line = reader.readLine();
@@ -113,14 +127,14 @@ if launchPoint == "E3M_PUSH":
         if(e3msScripSet.isEmpty()):
             e3msScript=e3msScripSet.add()
             e3msScript.setValue("autoscript",autoscriptName,MboConstants.NOACCESSCHECK)
-            e3msScript.setValue("push",1,MboConstants.NOACCESSCHECK)
-            e3msScript.setValue("pull",0,MboConstants.NOACCESSCHECK)
+            #e3msScript.setValue("push",1,MboConstants.NOACCESSCHECK)
+            #e3msScript.setValue("pull",0,MboConstants.NOACCESSCHECK)
             e3msScripSet.save()
-        else:
-            e3msScript=e3msScripSet.getMbo(0)
-            e3msScript.setValue("push",1,MboConstants.NOACCESSCHECK)
-            e3msScript.setValue("pull",0,MboConstants.NOACCESSCHECK)
-            e3msScripSet.save()
+        #else:
+         #   e3msScript=e3msScripSet.getMbo(0)
+            #e3msScript.setValue("push",1,MboConstants.NOACCESSCHECK)
+            #e3msScript.setValue("pull",0,MboConstants.NOACCESSCHECK)
+          #  e3msScripSet.save()
     
     else:
         githubcontent = String.format("{\"message\":\"Add file\",\"content\":\"%s\"}",sourceCode);
@@ -142,11 +156,11 @@ if launchPoint == "E3M_PUSH":
         if(e3msScripSet.isEmpty()):
             e3msScript=e3msScripSet.add()
             e3msScript.setValue("autoscript",autoscriptName,MboConstants.NOACCESSCHECK)
-            e3msScript.setValue("push",1,MboConstants.NOACCESSCHECK)
-            e3msScript.setValue("pull",0,MboConstants.NOACCESSCHECK)
+            #e3msScript.setValue("push",1,MboConstants.NOACCESSCHECK)
+            #e3msScript.setValue("pull",0,MboConstants.NOACCESSCHECK)
             e3msScripSet.save()
-        else:
-            e3msScript=e3msScripSet.getMbo(0)
-            e3msScript.setValue("push",1,MboConstants.NOACCESSCHECK)
-            e3msScript.setValue("pull",0,MboConstants.NOACCESSCHECK)
-            e3msScripSet.save()
+        #else:
+            #e3msScript=e3msScripSet.getMbo(0)
+            #e3msScript.setValue("push",1,MboConstants.NOACCESSCHECK)
+            #e3msScript.setValue("pull",0,MboConstants.NOACCESSCHECK)
+            #e3msScripSet.save()

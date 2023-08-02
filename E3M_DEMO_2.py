@@ -7,4 +7,3 @@ from java.io import OutputStream
 from java.io import InputStreamReader
 from java.lang import StringBuilder
 from java.io import BufferedReader
-from java.io import IOException

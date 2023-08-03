@@ -18,7 +18,6 @@ logger.debug(" Start E3M_PULL");
 
 def fetch_file_content_from_github(github_raw_url,gitHubToken):
     #java_url = URL(str(github_raw_url))
-    #new line
     conn = github_raw_url.openConnection()
     #con= url.openConnection()
     conn.setRequestMethod("GET");
@@ -72,10 +71,10 @@ if launchPoint == "E3M_PULL":
         
         #data = fetch_file_content_from_github(github_raw_url,gitHubToken)
         data = content
+        raise TypeError(content)
         logger.debug("data "+data);
         
         if data:
-            
             #e3msScripSet=mbo.getMboSet("e3mautoscript")
             e3msScripSet = MXServer.getMXServer().getMboSet("E3MAUTOSCRIPT", mbo.getUserInfo())
             e3msScripSet.setWhere("AUTOSCRIPT='"+autoscriptName+"'")

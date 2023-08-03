@@ -15,13 +15,10 @@ from psdi.util.logging import MXLoggerFactory
 
 logger = MXLoggerFactory.getLogger("maximo.script.GIT");
 logger.debug(" Start E3M_PULL");
-#new line added
-#second new line
-#third new line
-print()
-def fetch_file_content_from_github(github_raw_url,gitHubToken):
+
+def fetch_file_content_from_github(url,gitHubToken):
     #java_url = URL(str(github_raw_url))
-    conn = github_raw_url.openConnection()
+    conn = url.openConnection()
     #con= url.openConnection()
     conn.setRequestMethod("GET");
     conn.setRequestProperty("Content-Type", "application/json")
@@ -38,6 +35,7 @@ def fetch_file_content_from_github(github_raw_url,gitHubToken):
     input_reader.close()
     conn.disconnect()
     return content
+    raise TypeError(content)
     
 
 autoscriptName=mbo.getString("AUTOSCRIPT")

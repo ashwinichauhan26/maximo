@@ -34,7 +34,6 @@ def fetch_file_content_from_github(url,gitHubToken):
 
     input_reader.close()
     conn.disconnect()
-    raise TypeError(content)
     return content
     
     

@@ -17,6 +17,7 @@ logger = MXLoggerFactory.getLogger("maximo.script.GIT");
 logger.debug(" Start E3M_PULL");
 #new line added
 #second new line
+#third new line
 
 def fetch_file_content_from_github(github_raw_url,gitHubToken):
     #java_url = URL(str(github_raw_url))

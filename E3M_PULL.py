@@ -34,8 +34,9 @@ def fetch_file_content_from_github(url,gitHubToken):
 
     input_reader.close()
     conn.disconnect()
-    return content
     raise TypeError(content)
+    return content
+    
     
 
 autoscriptName=mbo.getString("AUTOSCRIPT")

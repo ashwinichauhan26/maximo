@@ -35,8 +35,7 @@ def fetch_file_content_from_github(url,gitHubToken):
     input_reader.close()
     conn.disconnect()
     return content
-    
-    
+
 
 autoscriptName=mbo.getString("AUTOSCRIPT")
 source=mbo.getString("SOURCE")

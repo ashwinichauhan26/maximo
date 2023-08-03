@@ -1,2 +1,2 @@
-#23
+#24
 print "Hello world"

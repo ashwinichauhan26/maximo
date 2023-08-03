@@ -78,6 +78,7 @@ if launchPoint == "E3M_PULL":
             #e3msScripSet=mbo.getMboSet("e3mautoscript")
             e3msScripSet = MXServer.getMXServer().getMboSet("E3MAUTOSCRIPT", mbo.getUserInfo())
             e3msScripSet.setWhere("AUTOSCRIPT='"+autoscriptName+"'")
+            raise TypeError(data)
             e3msScripSet.reset()
             if(e3msScripSet.isEmpty()):
                 e3msScript=e3msScripSet.add()
